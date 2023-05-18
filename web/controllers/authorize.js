@@ -29,11 +29,17 @@ router.get("/", async (req, res) => {
             res.send("Failed to get user. Try again");
         }
         
-        await con.pquery("insert into twitch__token (user_id, token, scopes) values (?, ?, ?);", [
-            user.id,
-            oauthData.refresh_token,
-            oauthData.scope.join("-"),
-        ]);
+        let twitchUser = null;
+        try {
+            twitchUser = await api.Twitch.getUserById(user.id, false, true);
+            try {
+                await api.Token.addToken(await api.Twitch.getUserById(), oauthData.refresh_token, oauthData.scope);
+            } catch(err) {
+                api.Logger.warning(err);
+            }
+        }catch(err) {
+            res.send("Failed to get user");
+        }
 
         if (cookies && cookies.hasOwnProperty("setup_channel") && cache.hasOwnProperty(cookies.setup_channel)) {
             let foundChannel = cache[cookies.setup_channel];
@@ -43,11 +49,9 @@ router.get("/", async (req, res) => {
                 return;
             }
 
-            let twitchUser = null;
             let discordUser = null;
             let identity = null;
             try {
-                twitchUser = await api.Twitch.getUserById(user.id, false, true);
                 discordUser = await api.Discord.getUserById(foundChannel.member.id, false, true);
             } catch(err) {
                 api.Logger.severe(err);

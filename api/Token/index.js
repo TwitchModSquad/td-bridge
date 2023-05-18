@@ -43,6 +43,42 @@ class TokenManager {
     }
 
     /**
+     * Adds a token to the database and cache
+     * @param {TwitchUser} user 
+     * @param {string} token 
+     * @param {string[]} scopes
+     * @returns {Promise<Token>}
+     */
+    addToken(user, token, scopes) {
+        return new Promise((resolve, reject) => {
+            con.query("insert into twitch__token (user_id, token, scopes) values (?, ?, ?);", [
+                user.id,
+                token,
+                scopes.join("-"),
+            ], err => {
+                if (!err) {
+                    con.query("select id from twitch__token where user_id = ? and token = ? and scopes = ? order by id desc;", (err, res) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        if (res.length > 0) {
+                            resolve(new Token(
+                                res[0].id,
+                                user,
+                                token,
+                                scopes
+                            ))
+                        } else
+                            reject("Unable to retrieve token");
+                    });
+                } else reject(err);
+            });
+        });
+    }
+
+    /**
      * Returns tokens by User and Scope
      * @param {TwitchUser} user 
      * @param {string} scope 
