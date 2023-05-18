@@ -33,10 +33,9 @@ router.get("/", async (req, res) => {
         try {
             twitchUser = await api.Twitch.getUserById(user.id, false, true);
             try {
-                await api.Token.addToken(await api.Twitch.getUserById(), oauthData.refresh_token, oauthData.scope);
+                await api.Token.addToken(twitchUser, oauthData.refresh_token, oauthData.scope);
             } catch(err) {
                 api.Logger.warning(err);
-                console.log('add token')
             }
         }catch(err) {
             res.send("Failed to get user");
