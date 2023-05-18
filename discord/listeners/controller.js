@@ -53,7 +53,7 @@ const listener = {
                 .setDescription(message)
                 .setColor(0x772ce8);
 
-            interaction.reply({embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true}).catch(api.Logger.warning);
         }
 
         const error = message => {
@@ -62,7 +62,7 @@ const listener = {
                 .setDescription(message)
                 .setColor(0xe83b3b);
 
-            interaction.reply({embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true}).catch(api.Logger.warning);
         }
 
         interaction.success = success;

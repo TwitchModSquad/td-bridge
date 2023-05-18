@@ -20,7 +20,7 @@ const listener = {
                 .setDescription(message)
                 .setColor(0x772ce8);
 
-            interaction.reply({embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true}).catch(global.api.Logger.warning)
         }
 
         const error = message => {
@@ -29,7 +29,7 @@ const listener = {
                 .setDescription(message)
                 .setColor(0xe83b3b);
 
-            interaction.reply({embeds: [embed], ephemeral: true})
+            interaction.reply({embeds: [embed], ephemeral: true}).catch(global.api.Logger.warning)
         }
 
         interaction.success = success;
@@ -39,7 +39,7 @@ const listener = {
             cmd.execute(interaction);
         } catch (error) {
             global.api.Logger.warning(error);
-            interaction.reply('***There was an error trying to execute that command!***');
+            interaction.reply('***There was an error trying to execute that command!***').catch(global.api.Logger.warning);
         }
     }
 };

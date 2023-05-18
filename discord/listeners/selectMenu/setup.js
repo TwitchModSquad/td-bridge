@@ -35,7 +35,7 @@ let listener = {
             .setColor(0x772ce8)
             .setDescription(`Success! In order to complete the bridge, please authorize with Twitch to complete setup [here](${config.uri}authorize/setup/${encodeURIComponent(interaction.channelId)}).`);
 
-        interaction.reply({embeds: [embed], ephemeral: true});
+        interaction.reply({embeds: [embed], ephemeral: true}).catch(global.api.Logger.warning);
     }
 };
 

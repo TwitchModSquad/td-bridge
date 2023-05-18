@@ -41,7 +41,7 @@ const command = {
                 (isMod ? api.Authentication.Twitch.getURL("chat:read chat:edit moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:announcements") : api.Authentication.Twitch.getURL("chat:read chat:edit")) +
             ")");
 
-        interaction.reply({embeds: [embed], ephemeral: true});
+        interaction.reply({embeds: [embed], ephemeral: true}).catch(api.Logger.warning);
     }
 };
 

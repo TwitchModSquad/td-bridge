@@ -44,7 +44,7 @@ const command = {
         const row = new ActionRowBuilder()
             .setComponents(selectMenu);
 
-        interaction.reply({embeds: [embed], components: [row], ephemeral: true});
+        interaction.reply({embeds: [embed], components: [row], ephemeral: true}).catch(global.api.Logger.warning);
     }
 };
 
