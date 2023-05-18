@@ -57,7 +57,11 @@ class TokenManager {
                 scopes.join("-"),
             ], err => {
                 if (!err) {
-                    con.query("select id from twitch__token where user_id = ? and token = ? and scopes = ? order by id desc;", (err, res) => {
+                    con.query("select id from twitch__token where user_id = ? and token = ? and scopes = ? order by id desc;", [
+                        user.id,
+                        token,
+                        scopes.join("-"),
+                    ], (err, res) => {
                         if (err) {
                             reject(err);
                             return;
