@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
             oauthData.scope.join("-"),
         ]);
 
-        if (cookies.hasOwnProperty("setup_channel") && cache.hasOwnProperty(cookies.setup_channel)) {
+        if (cookies && cookies.hasOwnProperty("setup_channel") && cache.hasOwnProperty(cookies.setup_channel)) {
             let foundChannel = cache[cookies.setup_channel];
 
             if (foundChannel.type !== "Interactive" && foundChannel.type !== "Message Stack") {
