@@ -38,7 +38,7 @@ const command = {
             .setTitle("Connect your Twitch account")
             .setColor(0x772ce8)
             .setDescription("Authorize your account with Twitch below to utilize chat features.\n[Connect your account](" +
-                (isMod ? api.Authentication.Twitch.getURL("chat:edit moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:announcements") : api.Authentication.Twitch.getURL("chat:edit")) +
+                (isMod ? api.Authentication.Twitch.getURL("chat:read chat:edit moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:announcements") : api.Authentication.Twitch.getURL("chat:read chat:edit")) +
             ")");
 
         interaction.reply({embeds: [embed], ephemeral: true});
