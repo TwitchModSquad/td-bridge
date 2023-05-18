@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TDBridge - Setup Channel</title>
+
+    <%- include("../../partials/head") %>
+</head>
+<body>
+
+    <main>
+        <section class="modalike">
+            <h1><i class="fa-duotone fa-gears"></i> TDBridge Setup</h1>
+            <p>
+                <strong>Hello, <%= channel.member.user.username %>!</strong><br/>
+                Please authorize your Twitch account below to complete setup of TDBridge.<br/>
+                The bridge will be set up in channel <a class="channel" href="https://discord.com/channels/<%= channel.channel.guild.id %>/<%= channel.channel.id %>" target="__blank"><%= channel.channel.name %></a><br/><br/>
+                <strong>Type of bridge:</strong> <code><%= channel.type %></code>
+            </p>
+            <a class="login login-twitch" type="button" href="<%= twitchURI %>">
+                Login via Twitch
+            </a>
+        </section>
+    </main>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>

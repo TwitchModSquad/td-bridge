@@ -1,0 +1,33 @@
+{
+  "name": "td-bridge",
+  "version": "1.0.0",
+  "description": "Creates a two-way bridge between a specified Twitch channel chat and a Discord channel.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TwitchModSquad/td-bridge.git"
+  },
+  "keywords": [
+    "discord",
+    "twitch",
+    "bot"
+  ],
+  "author": "Twijn",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/TwitchModSquad/td-bridge/issues"
+  },
+  "homepage": "https://github.com/TwitchModSquad/td-bridge#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "discord.js": "^14.11.0",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "tmi.js": "^1.8.5",
+    "twitch": "^4.6.7"
+  }
+}
