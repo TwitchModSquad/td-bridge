@@ -29,7 +29,7 @@ const listener = {
                 .setColor(0xe83b3b)
                 .setDescription("We don't have a token under your user to utilize for chat messages.\nTo create one, use the `/connect` command.")
                 .setFooter({text: "This message will expire in 6 seconds."});
-            message.reply({embeds: [embed]}).then(deleteAfter(6000)).catch(api.Logger.warning);
+            message.channel.send({embeds: [embed]}).then(deleteAfter(6000)).catch(api.Logger.warning);
             message.delete().catch(api.Logger.warning);
         }
 
