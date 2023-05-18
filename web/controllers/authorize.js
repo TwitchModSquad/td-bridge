@@ -36,9 +36,11 @@ router.get("/", async (req, res) => {
                 await api.Token.addToken(await api.Twitch.getUserById(), oauthData.refresh_token, oauthData.scope);
             } catch(err) {
                 api.Logger.warning(err);
+                console.log('add token')
             }
         }catch(err) {
             res.send("Failed to get user");
+            return;
         }
 
         if (cookies && cookies.hasOwnProperty("setup_channel") && cache.hasOwnProperty(cookies.setup_channel)) {
