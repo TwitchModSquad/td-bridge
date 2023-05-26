@@ -68,12 +68,24 @@ class TokenManager {
                         }
 
                         if (res.length > 0) {
-                            resolve(new Token(
+                            const newToken = new Token(
                                 res[0].id,
                                 user,
                                 token,
                                 scopes
-                            ))
+                            );
+
+                            resolve(newToken);
+
+                            this.tokens = this.tokens.filter(x => !(x.user.id === user.id && x.scopes.join("-") === scopes.join("-")));
+                            this.tokens.push(newToken);
+
+                            con.query("delete from twitch__token where user_id = ? and scopes = ? and created < date_sub(now(), interval 1 minute);", [
+                                user.id,
+                                scopes.join("-"),
+                            ], err => {
+                                if (err) global.api.Logger.warning(err);
+                            });
                         } else
                             reject("Unable to retrieve token");
                     });
@@ -150,7 +162,9 @@ class TokenManager {
                 clearTimeout(closeTimeout);
             });
 
-            client.connect();
+            client.connect().catch(err => {
+                reject(err);
+            });
         });
     }
 

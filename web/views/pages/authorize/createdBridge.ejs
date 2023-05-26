@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TDBridge - Created Bridge</title>
+
+    <%- include("../../partials/head") %>
+</head>
+<body>
+
+    <main>
+        <section class="modalike">
+            <h1><i class="fa-duotone fa-gears"></i> Bridge created!</h1>
+            <p>
+                <strong>Bridge creation was successful!</strong>
+            </p>
+            <p>
+                A TDBridge was setup between Twitch channel <code><%= bridge.channel.display_name %></code> and <a class="channel" href="https://discord.com/channels/<%= bridge.channel.guild.id %>/<%= bridge.channel.id %>" target="__blank"><%= bridge.channel.name %></a>. You may now close this tab.
+            </p>
+        </section>
+    </main>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>

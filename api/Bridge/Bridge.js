@@ -60,14 +60,27 @@ class Bridge {
      * Handles a message sent in Twitch by a user
      * @param {TwitchUser} user
      * @param {string} message
+     * @param {string} badges
      */
-    async handleMessage(user, message) {
+    async handleMessage(user, message, badges = "") {
+        const isPartner = user.affiliation === "partner";
+
+        if (!badges) badges = "";
+        const isBroadcaster = badges.indexOf("broadcaster/") !== -1;
+        const isModerator = badges.indexOf("moderator/") !== -1;
+        const isSubscriber = badges.indexOf("subscriber/") !== -1;
+
         if (this.type === "Interactive") {
             this.webhookClient.send({
                 content: message,
                 avatarURL: user.profile_image_url,
-                username: user.display_name.toLowerCase() === user.login.toLowerCase() ?
-                    user.display_name : `${user.display_name} (${user.login})`
+                username: 
+                    (isBroadcaster ? "🎥 " : "") +
+                    (isModerator ? "⚔ " : "") +
+                    (isSubscriber ? "✪ " : "") +
+                    (user.display_name.toLowerCase() === user.login.toLowerCase() ?
+                        user.display_name : `${user.display_name} (${user.login})`) +
+                    (isPartner ? " ☑️" : "")
             }).catch(global.api.Logger.warning);
         } else if (this.type === "Message Stack") {
             let lastMessage = this.lastMessage;

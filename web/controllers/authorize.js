@@ -4,6 +4,7 @@ const api = require("../../api/");
 const con = require("../../database");
 const {cache} = require("../../discord/listeners/selectMenu/setup");
 const FullIdentity = require("../../api/FullIdentity");
+const { EmbedBuilder, PermissionsBitField } = require("discord.js");
 
 router.get("/", async (req, res) => {
     const {query, cookies} = req;
@@ -99,14 +100,72 @@ router.get("/", async (req, res) => {
 
             try {
                 const bridge = await api.Bridge.addBridge(twitchUser, foundChannel.type, foundChannel.channel);
-                res.send("Created bridge: " + bridge.id);
+                res.render("pages/authorize/createdBridge", {bridge: bridge});
+
+                const embed = new EmbedBuilder()
+                    .setTitle("Bridge created!")
+                    .setColor(0x772ce8)
+                    .setDescription(`This channel is setup as a bridge to the Twitch channel \`${bridge.user.display_name}\`!`)
+                    .addFields({
+                        name: "Chatting",
+                        value: "In order to chat, you must connect your Twitch account using the `/connect` command or clicking [here](" + api.Authentication.Twitch.getURL("chat:read chat:edit") + ")."
+                    });
+
+                bridge.channel.send({embeds: [embed]}).then(message => {
+                    message.pin({reason: "Pin connection details"}).catch(err => {
+                        api.Logger.warning(err);
+                    });
+                }, err => {
+                    api.Logger.warning(err);
+                });
+
+                try {
+                    await bridge.channel.guild.roles.fetch();
+                } catch(err) {
+                    api.Logger.warning(err);
+                }
+
+                bridge.channel.edit({
+                    topic: `TDBridge to ${bridge.user.display_name}! Use the /connect command to connect your account and chat!`,
+                    reason: "Edit permission overwrites and topic",
+                }).catch(api.Logger.warning);
+
+                bridge.channel.permissionOverwrites.set([
+                    [
+                        {
+                            id: bridge.channel.guild.roles.everyone,
+                            allow: [
+                                PermissionsBitField.Flags.ViewChannel,
+                                PermissionsBitField.Flags.SendMessages,
+                            ],
+                            deny: [
+                                PermissionsBitField.Flags.SendMessagesInThreads,
+                                PermissionsBitField.Flags.CreatePublicThreads,
+                                PermissionsBitField.Flags.CreatePrivateThreads,
+                                PermissionsBitField.Flags.EmbedLinks,
+                                PermissionsBitField.Flags.AttachFiles,
+                                PermissionsBitField.Flags.UseExternalEmojis,
+                                PermissionsBitField.Flags.UseExternalStickers,
+                                PermissionsBitField.Flags.SendTTSMessages,
+                                PermissionsBitField.Flags.SendVoiceMessages,
+                            ],
+                        },
+                        {
+                            id: bridge.channel.guild.roles.botRoleFor(bridge.channel.client.user),
+                            allow: [
+                                PermissionsBitField.Flags.ManageMessages,
+                            ],
+                        },
+                    ]
+                ]).catch(api.Logger.warning);
+
                 delete cache[cookies.setup_channel];
             } catch(err) {
                 api.Logger.warning(err);
                 res.send("An unexpected error occurred while creating the bridge!");
             }
         } else {
-            res.send("Success!");
+            res.render("pages/authorize/connected", {user: twitchUser});
         }
     } else {
         res.send("No code provided");
@@ -120,6 +179,27 @@ router.get("/setup/:setup", (req, res) => {
         res.render("pages/authorize/channel", {channel: foundChannel, twitchURI: api.Authentication.Twitch.getURL("moderation:read moderator:manage:announcements moderator:manage:chat_messages chat:edit chat:read")});
     } else {
         res.send("Invalid setup ID")
+    }
+});
+
+router.get("/connect/:streamer/:connect", async (req, res) => {
+    try {
+        const streamer = await api.Twitch.getUserById(req.params.streamer);
+        const user = await api.Discord.getUserById(req.params.connect);
+        const roles = await streamer.getRoles();
+        if (roles.find(x => x.role === "moderator" && x.streamer.id))
+        res.render("pages/authorize/connect", {user: user, twitchURI: api.Authentication.Twitch.getURL("chat:read chat:edit moderator:manage:chat_messages moderator:manage:banned_users moderator:manage:announcements")});
+    } catch(err) {
+        res.send("Unable to get Discord user or streamer!");
+    }
+});
+
+router.get("/connect/:connect", async (req, res) => {
+    try {
+        const user = await api.Discord.getUserById(req.params.connect);
+        res.render("pages/authorize/connect", {user: user, twitchURI: api.Authentication.Twitch.getURL("chat:read chat:edit")});
+    } catch(err) {
+        res.send("Unable to get Discord user!");
     }
 });
 

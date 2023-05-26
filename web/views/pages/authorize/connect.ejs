@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TDBridge - Setup Channel</title>
+
+    <%- include("../../partials/head") %>
+</head>
+<body>
+
+    <main>
+        <section class="modalike">
+            <h1><i class="fa-duotone fa-gears"></i> TDBridge Setup</h1>
+            <p>
+                <strong>Hello, <%= user.username %>!</strong><br/>
+                Please authorize with Twitch below to connect your Twitch account to Discord.
+            </p>
+            <a class="login login-twitch" type="button" href="<%= twitchURI %>">
+                Login via Twitch
+            </a>
+        </section>
+    </main>
+    
+    <%- include("../../partials/js") %>
+</body>
+</html>
