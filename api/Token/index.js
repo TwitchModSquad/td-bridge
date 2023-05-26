@@ -23,7 +23,7 @@ class TokenManager {
      * Initialize the TokenManager
      */
     init() {
-        con.query("select id, user_id, token, scopes from twitch__token and type = 'tdbridge';", async (err, res) => {
+        con.query("select id, user_id, token, scopes from twitch__token where type = 'tdbridge';", async (err, res) => {
             if (!err) {
                 let tokens = [];
                 for (let i = 0; i < res.length; i++) {
