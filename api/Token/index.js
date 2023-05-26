@@ -23,7 +23,7 @@ class TokenManager {
      * Initialize the TokenManager
      */
     init() {
-        con.query("select id, user_id, token, scopes from twitch__token;", async (err, res) => {
+        con.query("select id, user_id, token, scopes from twitch__token and type = 'tdbridge';", async (err, res) => {
             if (!err) {
                 let tokens = [];
                 for (let i = 0; i < res.length; i++) {
@@ -51,13 +51,13 @@ class TokenManager {
      */
     addToken(user, token, scopes) {
         return new Promise((resolve, reject) => {
-            con.query("insert into twitch__token (user_id, token, scopes) values (?, ?, ?);", [
+            con.query("insert into twitch__token (user_id, token, scopes, type) values (?, ?, ?, 'tdbridge');", [
                 user.id,
                 token,
                 scopes.join("-"),
             ], err => {
                 if (!err) {
-                    con.query("select id from twitch__token where user_id = ? and token = ? and scopes = ? order by id desc;", [
+                    con.query("select id from twitch__token where user_id = ? and token = ? and scopes = ? and type = 'tdbridge' order by id desc;", [
                         user.id,
                         token,
                         scopes.join("-"),
@@ -80,7 +80,7 @@ class TokenManager {
                             this.tokens = this.tokens.filter(x => !(x.user.id === user.id && x.scopes.join("-") === scopes.join("-")));
                             this.tokens.push(newToken);
 
-                            con.query("delete from twitch__token where user_id = ? and scopes = ? and created < date_sub(now(), interval 1 minute);", [
+                            con.query("delete from twitch__token where user_id = ? and scopes = ? and created < date_sub(now(), interval 1 minute) and type = 'tdbridge';", [
                                 user.id,
                                 scopes.join("-"),
                             ], err => {

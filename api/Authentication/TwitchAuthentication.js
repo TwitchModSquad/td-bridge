@@ -115,7 +115,7 @@ class TwitchAuthentication {
                         con.query("update twitch__user set refresh_token = null, scopes = null where refresh_token = ?;", [refresh_token], err => {
                             if (err) global.api.Logger.warning(err);
                         });
-                        con.query("delete from twitch__token where token = ?;", [refresh_token], err => {
+                        con.query("delete from twitch__token where token = ? and type = 'tdbridge';", [refresh_token], err => {
                             if (err) global.api.Logger.warning(err);
                         });
                     }
