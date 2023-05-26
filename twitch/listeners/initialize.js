@@ -24,6 +24,8 @@ const listener = {
                 joined.push(bridge.user.login);
             }
         });
+
+        api.Logger.info("Startup completed!");
     }
 };
 
