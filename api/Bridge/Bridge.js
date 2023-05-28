@@ -1,6 +1,8 @@
-const { TextChannel, WebhookClient, Webhook, Message } = require("discord.js");
+const { TextChannel, WebhookClient, Message } = require("discord.js");
 const TwitchUser = require("../Twitch/TwitchUser");
 const config = require("../../config.json");
+
+const MENTION_REGEX = /@\w+/g
 
 class Bridge {
 
@@ -69,6 +71,22 @@ class Bridge {
         const isBroadcaster = badges.indexOf("broadcaster/") !== -1;
         const isModerator = badges.indexOf("moderator/") !== -1;
         const isSubscriber = badges.indexOf("subscriber/") !== -1;
+
+        let mentionSearch = message.match(MENTION_REGEX);
+        if (mentionSearch) {
+            for (let i = 0; i < mentionSearch.length; i++) {
+                const mention = mentionSearch[i];
+                try {
+                    const user = (await global.api.Twitch.getUserByName(mention.substring(1)))[0];
+                    if (user.identity?.id) {
+                        const identity = await global.api.getFullIdentity(user.identity.id);
+                        if (identity.discordAccounts.length > 0) {
+                            message = message.replace(mention, `<@${identity.discordAccounts[0].id}>`);
+                        }
+                    }
+                } catch(err) {}
+            }
+        }
 
         if (this.type === "Interactive") {
             this.webhookClient.send({

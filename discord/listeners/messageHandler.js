@@ -42,7 +42,27 @@ const listener = {
                         const client = await identity.twitchAccounts[0].getTMIClient();
                         for (let i = 0; i < bridges.length; i++) {
                             const bridge = bridges[i];
-                            client.say(bridge.user.login, message.content).then(() => {
+                            let content = message.content;
+
+                            try {
+                                if (message.mentions && message.mentions.users.size > 0) {
+                                    const users = Array.from(message.mentions.users.values());
+                                    for (let u = 0; u < users.length; u++) {
+                                        const user = users[u];
+                                        const apiUser = await api.Discord.getUserById(user.id);
+                                        if (apiUser.identity?.id) {
+                                            const identity = await api.getFullIdentity(apiUser.identity.id);
+                                            if (identity.twitchAccounts.length > 0) {
+                                                content = content.replace(`<@${user.id}>`, `@${identity.twitchAccounts[0].display_name}`);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch(err) {
+                                api.Logger.severe(err);
+                            }
+
+                            client.say(bridge.user.login, content).then(() => {
                                 message.delete().catch(api.Logger.warning);
                             }, error);
                         }
