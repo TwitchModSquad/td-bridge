@@ -3,6 +3,7 @@ const con = require("../database");
 const Twitch = require("./Twitch/");
 const Discord = require("./Discord/");
 const BridgeManager = require("./Bridge/");
+const LiveListener = require("./LiveListener/");
 const Authentication = require("./Authentication/");
 const TokenManager = require("./Token/");
 
@@ -27,6 +28,12 @@ class API {
      * @type {BridgeManager}
      */
     Bridge = new BridgeManager();
+
+    /**
+     * Base live listener API
+     * @type {LiveListener}
+     */
+    LiveListener = new LiveListener();
 
     /**
      * Base Token API

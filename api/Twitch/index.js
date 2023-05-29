@@ -22,15 +22,6 @@ const api = new ApiClient({ authProvider });
 
 let commands = [];
 
-setTimeout(() => {
-    for (const name in global.twitchCommands) {
-        commands = [
-            ...commands,
-            name
-        ]
-    }
-}, 500);
-
 /**
  * Utility class for Twitch services
  */

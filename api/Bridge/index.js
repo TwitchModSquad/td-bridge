@@ -23,14 +23,19 @@ class BridgeManager {
 
             let bridges = [];
             for (let i = 0; i < res.length; i++) {
-                bridges.push(new Bridge(
-                    res[i].id,
-                    res[i].type,
-                    await global.api.Twitch.getUserById(res[i].user_id),
-                    await global.client.discord.channels.fetch(res[i].channel_id),
-                    res[i].type === "Interactive" ? new WebhookClient({id: res[i].webhook_id, token: res[i].webhook_token}) : null
-                ));
+                try {
+                    bridges.push(new Bridge(
+                        res[i].id,
+                        res[i].type,
+                        await global.api.Twitch.getUserById(res[i].user_id),
+                        await global.client.discord.channels.fetch(res[i].channel_id),
+                        res[i].type === "Interactive" ? new WebhookClient({id: res[i].webhook_id, token: res[i].webhook_token}) : null
+                    ));
+                } catch(err2) {
+                    global.api.Logger.severe(err2);
+                }
             }
+            global.api.Logger.info(`Loaded ${bridges.length} bridge(s)`);
             this.bridges = bridges;
         });
     }
@@ -44,6 +49,11 @@ class BridgeManager {
      */
     addBridge(user, type, channel) {
         return new Promise(async (resolve, reject) => {
+            if (this.getBridgesByChannel(channel.id).length > 0) {
+                reject("A bridge already exists in this channel!");
+                return;
+            }
+
             let webhook;
             if (type === "Interactive") {
                 webhook = await channel.createWebhook({
