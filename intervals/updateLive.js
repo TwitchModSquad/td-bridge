@@ -217,8 +217,6 @@ const interval = {
 
         const recordedStreams = await con.pquery("select id, user_id from bridge__live where end_time is null;");
 
-        api.Logger.info(`Retrieved ${users.length} monitored users with ${streams.length} online and ${recordedStreams.length} recorded`);
-
         const recordActivity = async (stream, user, liveId, fireEvent = true) => {
             let gameBoxArt = null;
             try {
