@@ -243,6 +243,39 @@ class TwitchAuthentication {
         });
     }
 
+    /**
+     * Sends an announcement to a channel
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @param {number} moderatorId 
+     * @param {string} message
+     * @param {"primary"|"blue"|"green"|"orange"|"purple"} color
+     * @returns {Promise<void>}
+     */
+    announce(accessToken, broadcasterId, moderatorId, message, color="primary") {
+        return new Promise(async (resolve, reject) => {
+            const result = await fetch(`https://api.twitch.tv/helix/chat/announcements?broadcaster_id=${encodeURIComponent(broadcasterId)}&moderator_id=${encodeURIComponent(moderatorId)}`, {
+                method: 'POST',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: new URLSearchParams({
+                    message: message,
+                    color: color,
+                }),
+            });
+        
+            if (result.status === 204) {
+                resolve();
+            } else if (result.status === 400) {
+                reject("Bad Request");
+            } else if (result.status === 401) {
+                reject("Unauthorized");
+            }
+        });
+    }
+
 }
 
 module.exports = TwitchAuthentication;

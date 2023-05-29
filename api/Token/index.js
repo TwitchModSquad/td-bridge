@@ -105,6 +105,27 @@ class TokenManager {
     }
 
     /**
+     * Tries refresh tokens until it reaches a proper access token
+     * @param {string[]} tokens 
+     * @returns {Promise<string>}
+     */
+    getAccessToken(tokens) {
+        return new Promise(async (resolve, reject) => {
+            let found = false;
+            for (let i = 0; i < tokens.length; i++) {
+                try {
+                    resolve(await tokens[i].getToken());
+                    found = true;
+                    break;
+                } catch(err) {
+                    global.api.Logger.warning(err);
+                }
+            }
+            if (!found) reject("No valid access tokens");
+        })
+    }
+
+    /**
      * Returns a TMI client for a user
      * @param {TwitchUser} user 
      * @returns {Promise<tmi.Client>}
@@ -118,14 +139,12 @@ class TokenManager {
 
             let accessToken = null;
             let tokens = this.getTokensByScope(user, "chat:edit");
-            for (let i = 0; i < tokens.length; i++) {
-                try {
-                    accessToken = await tokens[i].getToken();
-                    break;
-                } catch(err) {
-                    global.api.Logger.warning(err);
-                }
+            try {
+                accessToken = await this.getAccessToken(tokens);
+            } catch(err) {
+                global.api.Logger.warning(err);
             }
+            
 
             if (!accessToken) {
                 reject("Failed to retrieve chat:edit access token");
