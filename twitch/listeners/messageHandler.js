@@ -20,7 +20,7 @@ const listener = {
                 const user = await api.Twitch.getUserById(tags["user-id"], false, true);
                 for (let i = 0; i < bridges.length; i++) {
                     const bridge = bridges[i];
-                    bridge.handleMessage(user, message, tags["badges-raw"] ? tags["badges-raw"] : "");
+                    bridge.handleMessage(user, message, tags.id, tags["badges-raw"] ? tags["badges-raw"] : "");
                 }
             } catch(err) {
                 api.Logger.warning(err);
