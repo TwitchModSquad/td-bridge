@@ -276,6 +276,90 @@ class TwitchAuthentication {
         });
     }
 
+    /**
+     * Bans/times out a user in a channel
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @param {number} moderatorId 
+     * @param {number|string} userId 
+     * @param {number} duration
+     * @param {string} reason
+     * @returns {Promise<void>}
+     */
+    ban(accessToken, broadcasterId, moderatorId, userId, duration = null, reason = "") {
+        return new Promise(async (resolve, reject) => {
+            let body = {
+                data: {
+                    user_id: String(userId),
+                    reason: reason ? reason : "",
+                }
+            };
+            if (duration)
+                body.data.duration = duration;
+            
+            const result = await fetch(`https://api.twitch.tv/helix/moderation/bans?broadcaster_id=${encodeURIComponent(broadcasterId)}&moderator_id=${encodeURIComponent(moderatorId)}`, {
+                method: 'POST',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    ["Content-Type"]: "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify(body),
+            });
+        
+            result.json().then(data => {
+                if (result.status === 200) {
+                    resolve();
+                } else if (result.status === 400) {
+                    reject(data?.message ? data.message : "Bad Request");
+                } else if (result.status === 401) {
+                    reject(data?.message ? data.message : "Unauthorized");
+                } else if (result.status === 403) {
+                    reject(data?.message ? data.message : "Forbidden");
+                } else if (result.status === 409) {
+                    reject(data?.message ? data.message : "Conflict");
+                } else if (result.status === 429) {
+                    reject(data?.message ? data.message : "Too Many Requests");
+                }
+            })
+        });
+    }
+
+    /**
+     * Deletes a message in a channel
+     * @param {string} accessToken 
+     * @param {number} broadcasterId 
+     * @param {number} moderatorId 
+     * @param {string} messageId 
+     * @returns {Promise<void>}
+     */
+    deleteMessage(accessToken, broadcasterId, moderatorId, messageId) {
+        return new Promise(async (resolve, reject) => {
+            const result = await fetch(`https://api.twitch.tv/helix/moderation/chat?broadcaster_id=${encodeURIComponent(broadcasterId)}&moderator_id=${encodeURIComponent(moderatorId)}&message_id=${encodeURIComponent(messageId)}`, {
+                method: 'DELETE',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+        
+            if (result.status === 204) {
+                resolve();
+            } else if (result.status === 400) {
+                reject("Bad Request");
+            } else if (result.status === 401) {
+                reject("Unauthorized");
+            } else if (result.status === 403) {
+                reject("Forbidden");
+            } else if (result.status === 404) {
+                reject("Not Found")
+            } else if (result.status === 409) {
+                reject("Conflict");
+            } else if (result.status === 429) {
+                reject("Too Many Requests");
+            }
+        });
+    }
 }
 
 module.exports = TwitchAuthentication;
