@@ -103,6 +103,15 @@ class BridgeManager {
     }
 
     /**
+     * Retrieves a Bridge based on the Bridge ID
+     * @param {number} id
+     * @returns {Bridge}
+     */
+    getBridgeById(id) {
+        return this.bridges.find(x => x.id === id);
+    }
+
+    /**
      * Retrieves Bridges based on the user ID
      * @param {string|number} userId 
      * @returns {Bridge[]}
