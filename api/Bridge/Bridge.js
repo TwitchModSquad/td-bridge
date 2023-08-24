@@ -2,6 +2,8 @@ const { TextChannel, WebhookClient, Message } = require("discord.js");
 const TwitchUser = require("../Twitch/TwitchUser");
 const config = require("../../config.json");
 
+const con = require("../../database");
+
 const MENTION_REGEX = /@\w+/g
 
 class Bridge {
@@ -62,9 +64,10 @@ class Bridge {
      * Handles a message sent in Twitch by a user
      * @param {TwitchUser} user
      * @param {string} message
+     * @param {string} messageId
      * @param {string} badges
      */
-    async handleMessage(user, message, badges = "") {
+    async handleMessage(user, message, messageId, badges = "") {
         const isPartner = user.affiliation === "partner";
 
         if (!badges) badges = "";
@@ -99,7 +102,16 @@ class Bridge {
                     (user.display_name.toLowerCase() === user.login.toLowerCase() ?
                         user.display_name : `${user.display_name} (${user.login})`) +
                     (isPartner ? " ☑️" : "")
-            }).catch(global.api.Logger.warning);
+            }).then(message => {
+                con.query("insert into bridge__chat (id, discord_id, bridge_id, user_id) values (?, ?, ?, ?);", [
+                    messageId,
+                    message.id,
+                    this.id,
+                    user.id,
+                ], err => {
+                    if (err) global.api.Logger.warning(err);
+                });
+            }, global.api.Logger.warning);
         } else if (this.type === "Message Stack") {
             let lastMessage = this.lastMessage;
             if (!lastMessage) {
